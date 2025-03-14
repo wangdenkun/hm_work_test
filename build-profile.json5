@@ -2,7 +2,7 @@
   "app": {
     "signingConfigs": [
       {
-        "name": "default",
+        "name": "windows",
         "type": "HarmonyOS",
         "material": {
           "certpath": "C:\\Users\\ext.wangdekun1\\.ohos\\config\\default_work_test_0Nyb8ObEboiJZTyJvm6I6uQoYTW-q7dWUj-L8Tf2ThE=.cer",
@@ -13,12 +13,25 @@
           "storeFile": "C:\\Users\\ext.wangdekun1\\.ohos\\config\\default_work_test_0Nyb8ObEboiJZTyJvm6I6uQoYTW-q7dWUj-L8Tf2ThE=.p12",
           "storePassword": "0000001BFD828B69F8B70452EAC7D0B332EED92849B6E84A8B4085690824C2D82D0EC6F6FD13EC82474AF8"
         }
+      },
+      {
+        "name": "mac",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "/Users/wangdekun/.ohos/config/mac_hm_work_test__XLbHzwqTNgTNiYBpIaBgbQ07_4J9Q6CWIgRwF2yj9A=.cer",
+          "storePassword": "0000001B25385FA4C014E4BF1C6649733DE3D324295614B9CFB7CA6020789A11D5B0BE9B11D7AF9DAFBCA0",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001BCC5E6CEBAA3091AD3422730C8541E608844C4D2593BF34149D7A7881B6A73AF3106600CE0C30C4",
+          "profile": "/Users/wangdekun/.ohos/config/mac_hm_work_test__XLbHzwqTNgTNiYBpIaBgbQ07_4J9Q6CWIgRwF2yj9A=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/wangdekun/.ohos/config/mac_hm_work_test__XLbHzwqTNgTNiYBpIaBgbQ07_4J9Q6CWIgRwF2yj9A=.p12"
+        }
       }
     ],
     "products": [
       {
         "name": "default",
-        "signingConfig": "default",
+        "signingConfig": "mac",
         "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
