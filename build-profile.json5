@@ -1,0 +1,55 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\ext.wangdekun1\\.ohos\\config\\default_work_test_0Nyb8ObEboiJZTyJvm6I6uQoYTW-q7dWUj-L8Tf2ThE=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B41A7EF48244AED8BCFCBB4427D311480A5357B52DC3F89F26A5835F8046003274E4A4D11BA0EEE",
+          "profile": "C:\\Users\\ext.wangdekun1\\.ohos\\config\\default_work_test_0Nyb8ObEboiJZTyJvm6I6uQoYTW-q7dWUj-L8Tf2ThE=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\ext.wangdekun1\\.ohos\\config\\default_work_test_0Nyb8ObEboiJZTyJvm6I6uQoYTW-q7dWUj-L8Tf2ThE=.p12",
+          "storePassword": "0000001BFD828B69F8B70452EAC7D0B332EED92849B6E84A8B4085690824C2D82D0EC6F6FD13EC82474AF8"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
