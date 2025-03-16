@@ -1,6 +1,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { appOverlayManager } from '../overlay/AppOverlayManager'
 
 const DOMAIN = 0x0000;
 
@@ -29,6 +30,10 @@ export default class EntryAbility extends UIAbility {
       let bottomHeight = windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_NAVIGATION_INDICATOR).bottomRect.height;
       AppStorage.setOrCreate('statusHeight',px2vp(statusHeight));//状态栏高度
       AppStorage.setOrCreate('bottomHeight',px2vp(bottomHeight));// 底部导航条高度
+      let overlayManager = windowClass.getUIContext().getOverlayManager()
+      appOverlayManager.registerOverlayManger(overlayManager)
+      // AppStorage.setOrCreate('overlayManager', overlayManager)
+      // windowClass.setWindowLayoutFullScreen(true)
     });
   }
 

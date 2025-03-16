@@ -1,9 +1,10 @@
 import { display, window } from '@kit.ArkUI'
 
+const debug: boolean = false
+
 export class MoveAbleWrapperParams {
   /**
-   * 为null时 MoveAbleWrapper保持当前位置
-   * 不为null时 代表与整个屏幕可视范围的内边距
+   * 相对于屏幕的定位
    */
   edges: Edges | undefined
   /**
@@ -18,18 +19,18 @@ export class MoveAbleWrapperParams {
 }
 
 @Component
-export struct MoveAbleWrapper {
-  private debug: boolean = false
+export struct AppOverlayWrapper {
+  @Watch('changeEdges')
   @Prop edges: Edges
   @State _edges: Edges = {}
-  @Watch('showChange')
+  @Watch('changeShow')
   @Prop show: boolean
 
   @Builder
   childBuilder() {
   }
 
-  @BuilderParam customBuilder: () => void = this.childBuilder
+  @BuilderParam child: () => void = this.childBuilder
   @State debugTitle: string = 'Drag Me Please'
   private lastX: number = 0
   private lastY: number = 0
@@ -39,8 +40,9 @@ export struct MoveAbleWrapper {
   @State windowHeight: number = 0
   @State selfWidth: number = 0
   @State selfHeight: number = 0
-  @State globalPositionX: number = 0
-  @State globalPositionY: number = 0
+  // @State globalPositionX: number = 0
+  // @State globalPositionY: number = 0
+  @State globalPosition: Position = { x: 0, y: 0 }
   @State fingerInfo: string = ''
   private panOffsetDx: number = 0
   private panOffsetDy: number = 0
@@ -49,7 +51,26 @@ export struct MoveAbleWrapper {
   private needMatchRightAndX = false
   private needMatchBottomAndY = false
 
-  showChange() {
+  changeEdges() {
+    this.lastX = 0
+    this.lastY = 0
+    if (this.edges?.left !== undefined) {
+      this.lastX = Number(this.edges.left)
+    }
+    if (this.edges?.top !== undefined) {
+      this.lastY = Number(this.edges.top)
+    }
+    if (this.edges?.right !== undefined) {
+      this.lastX = this.windowWidth - Number(this.edges.right) - this.selfWidth
+    }
+    if (this.edges.bottom !== undefined) {
+      this.lastY =
+        this.windowHeight - this.systemBarHeight - this.selfHeight - this.bottomNavHeight - Number(this.edges.right)
+    }
+    this._edges = { left: this.lastX, top: this.lastY }
+  }
+
+  changeShow() {
     if (this.show) {
       if (this.edges) {
         this._edges = this.edges
@@ -89,17 +110,17 @@ export struct MoveAbleWrapper {
 
   build() {
     Stack() {
-      if (!this.debug && this.show) {
-        this.customBuilder()
+      if (!debug && this.show) {
+        this.child()
       }
-      if (this.debug && this.show) Column() {
+      if (debug && this.show) Column() {
         Text(this.debugTitle)
         Text(`windowWidth: ${this.windowWidth.toFixed(2)}`)
         Text(`windowHeight: ${this.windowHeight.toFixed(2)}`)
         Text(`systemBar: ${this.systemBarHeight.toFixed(2)}`)
         Text(`bottomNavHeight: ${this.bottomNavHeight.toFixed(2)}`)
-        Text(`globalPositionX: ${this.globalPositionX.toFixed(2)}`)
-        Text(`globalPositionY: ${this.globalPositionY.toFixed(2)}`)
+        Text(`globalPositionX: ${Number(this.globalPosition.x).toFixed(2)}`)
+        Text(`globalPositionY: ${Number(this.globalPosition.y).toFixed(2)}`)
         Text(`selfWidth: ${this.selfWidth.toFixed(2)}`)
         Text(`selfHeight: ${this.selfHeight.toFixed(2)}`)
         Text(`x: ${this.x.toFixed(2)}`)
@@ -107,6 +128,10 @@ export struct MoveAbleWrapper {
       }
     }
     .onAreaChange((ov, nv) => {
+      this.globalPosition = {
+        x: nv.globalPosition.x,
+        y: nv.globalPosition.y
+      }
       if (ov.width !== nv.width) {
         this.selfWidth = nv.width as number
         if (this.needMatchRightAndX) {
@@ -119,7 +144,8 @@ export struct MoveAbleWrapper {
       if (ov.height !== nv.height) {
         this.selfHeight = nv.height as number
         if (this.needMatchBottomAndY) {
-          this.lastY = this.windowHeight - Number(this._edges.bottom) - this.selfHeight - this.systemBarHeight - this.bottomNavHeight
+          this.lastY = this.windowHeight - Number(this._edges.bottom) - this.selfHeight - this.systemBarHeight -
+          this.bottomNavHeight
           this._edges.top = this.lastY
           this._edges.bottom = undefined
           this.needMatchBottomAndY = false
@@ -163,9 +189,12 @@ export struct MoveAbleWrapper {
     .gesture(
       TapGesture()
         .onAction(() => {
-          this.debugTitle += "1"
+          if (debug) {
+            this.debugTitle += "1"
+          }
         })
     )
+    .hitTestBehavior(HitTestMode.Block)
     .position(this._edges)
   }
 }
