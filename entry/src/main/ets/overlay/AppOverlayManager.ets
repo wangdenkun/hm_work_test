@@ -168,15 +168,8 @@ class AppOverlayManager {
     }
   }
 
-  private getBuildDataByTag(tag: string): AppOverlayWrapperBuildData | undefined {
-    if (this.overlayWindowsBuildData.hasKey(tag)) {
-      return this.overlayWindowsBuildData.get(tag)
-    }
-    return undefined
-  }
-
   showOverlay(tag: string, setting?: MoveAbleWrapperParams) {
-    let buildData = this.getBuildDataByTag(tag)
+    let buildData = this.overlayWindowsBuildData.get(tag)
     if (buildData === undefined) return
     if (this.overlayWindowNodes.hasKey(tag)) {
       if (setting) {
@@ -189,24 +182,21 @@ class AppOverlayManager {
   }
 
   hideOverlay(tag: string) {
-    let buildData = this.getBuildDataByTag(tag)
+    let buildData = this.overlayWindowsBuildData.get(tag)
     if (buildData === undefined) return
     if (this.overlayWindowNodes.hasKey(tag)) {
       buildData.content.getOverlayManager().hideComponentContent(this.overlayWindowNodes.get(tag))
-      this.overlayWindowsBuildData.get(tag).setting.show = false
+      buildData.setting.show = false
     }
   }
 
   updateSettingForOverlay(setting: MoveAbleWrapperParams, tag: string) {
-    let hasNode = this.overlayWindowNodes.hasKey(tag)
-    let hasBuilder = this.overlayWindowsBuildData.hasKey(tag)
-    if (!hasNode || !hasBuilder) {
-      return
-    }
-    let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
     let buildData = this.overlayWindowsBuildData.get(tag)
-    this.overlayWindowsBuildData.get(tag).setting = setting
-    node.update(new AppOverlayWrapperBuildData(buildData.content,setting,buildData.builder))
+    if (!buildData) return
+    buildData.setting = setting
+    let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
+    if (node === undefined) return
+    node.update(buildData)
   }
 
   getOverlayIsShowing(tag: string) {
@@ -219,9 +209,7 @@ class AppOverlayManager {
   }
 
   getInfoOfOverlay(tag: string): MoveAbleWrapperParams | undefined {
-    let hasBuildInfo = this.overlayWindowsBuildData.hasKey(tag)
-    if (hasBuildInfo === false) return undefined
-    return this.overlayWindowsBuildData.get(tag).setting
+    return this.overlayWindowsBuildData.get(tag)?.setting
   }
 
 }

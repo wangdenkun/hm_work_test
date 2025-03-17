@@ -3,6 +3,7 @@ import { appOverlayManager } from '../overlay/AppOverlayManager';
 import { AppOverlayWrapper, MoveAbleWrapperParams } from '../overlay/AppOverlayWrapper';
 import { OverlayContentPage } from './OverlayContentPage';
 import { Tmp } from './tmp';
+import { HashMap } from '@kit.ArkTS';
 
 enum  OverlayType {
   Feedback = 'Feedback',
@@ -56,8 +57,10 @@ export  struct AppOverlayTestPage {
   // 是否使用新Api
   @State useNewApi: boolean = true
 
-  test(vt: OverlayType) {
-    console.log(`---> typeof  vt:`, typeof  vt)
+  test() {
+    let hm = new HashMap<string,number>()
+    let y = hm.get('x')
+    console.log('---> y:', y)
   }
   async aboutToAppear() {
     let windowSize = display.getDefaultDisplaySync()
@@ -190,6 +193,8 @@ export  struct AppOverlayTestPage {
       Button('checkIsShowing').onClick(() => this.checkIsShowing())
       Blank().height(8)
       Button('getOverlayInfo').onClick(() => this.getOverlayInfo())
+      Blank().height(8)
+      Button('test').onClick(() => this.test())
       Blank().height(8)
       Row() {
         Text('使用新Api:')
