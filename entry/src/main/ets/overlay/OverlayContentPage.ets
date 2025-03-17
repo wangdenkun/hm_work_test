@@ -36,6 +36,6 @@ export  struct OverlayContentPage {
       })
   }
   onDidBuild(): void {
-    console.log(`---> this.selfInitWidth:`, this.textWidth)
+    // console.log(`---> this.selfInitWidth:`, this.textWidth)
   }
 }

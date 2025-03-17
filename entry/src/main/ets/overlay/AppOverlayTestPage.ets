@@ -12,11 +12,9 @@ enum  OverlayType {
 @Builder
 function builderOverlay(params: MoveAbleWrapperParams) {
   Stack() {
-    AppOverlayWrapper(
-      {
-        show: params.show,
-        edges: params.edges,
-      }
+    AppOverlayWrapper({
+      setting: params
+    }
     ) {
       OverlayContentPage()
         .width(100)
@@ -65,14 +63,17 @@ export  struct AppOverlayTestPage {
     let windowSize = display.getDefaultDisplaySync()
     this.windowWidth = px2vp(windowSize.width)
     this.windowHeight = px2vp(windowSize.height)
-    this.test(OverlayType.Feedback)
+    // this.test(OverlayType.Feedback)
+    this.addFeedBackOverlay()
   }
 
   aboutToDisappear(): void {
   }
 
   addFeedBackOverlay() {
-    let setting = new MoveAbleWrapperParams({ right: 100, bottom: 10 }, this.showOverlay);
+    // let setting = new MoveAbleWrapperParams({ right: 10, bottom: 10 }, this.showOverlay);
+    // let setting = new MoveAbleWrapperParams({ left: 10, top: 10 }, this.showOverlay);
+    let setting = new MoveAbleWrapperParams({ left: 10, bottom: 10 }, this.showOverlay);
 
     if (!this.useNewApi) {
       this.overlayNode = new ComponentContent(this.uiContext, wrapBuilder(builderOverlay), new MoveAbleWrapperParams({ right: 100, bottom: 10 }, this.showOverlay),)
@@ -201,7 +202,7 @@ export  struct AppOverlayTestPage {
     .height('100%')
     .backgroundColor(Color.Yellow)
     .onAreaChange((ov, nv) => {
-      console.log('---> main nv.height:', nv.height)
+      // console.log('---> main nv.height:', nv.height)
       AppStorage.setOrCreate('indexPageWidth', nv.width as number)
       AppStorage.setOrCreate('indexPageHeight', nv.height as number)
       AppStorage.setOrCreate('indexPageGlobalOffsetX', nv.globalPosition.x as number)
