@@ -5,9 +5,12 @@ import { HashMap } from '@kit.ArkTS'
 
 @Observed
 class AppOverlayWrapperBuildData {
+  content: UIContext
   setting: MoveAbleWrapperParams
   builder: WrappedBuilder<[]>
-  constructor(setting:MoveAbleWrapperParams,builder:WrappedBuilder<[]>) {
+
+  constructor(content: UIContext, setting: MoveAbleWrapperParams, builder: WrappedBuilder<[]>) {
+    this.content = content
     this.setting = setting
     this.builder = builder
   }
@@ -50,7 +53,7 @@ class AppOverlayManager {
   private overlayManager?: OverlayManager
 
   /**
-   * 注册 OverlayManger
+   * 注册 OverlayManger (新Api不需要注册OverlayManager 但是在addOverlay时需要提供Content以便支持多window)
    * @param overlayManger
    */
   registerOverlayManger(overlayManger: OverlayManager) {
@@ -140,7 +143,7 @@ class AppOverlayManager {
     if (hasSuchTagBuilder) {
       this.removeOverlay(tag)
     }
-    let buildData = new AppOverlayWrapperBuildData(setting, builder)
+    let buildData = new AppOverlayWrapperBuildData(content,setting, builder)
     this.overlayWindowsBuildData.set(tag, buildData)
     let overlayNode: ComponentContent<AppOverlayWrapperBuildData> =
       new ComponentContent(
@@ -149,35 +152,47 @@ class AppOverlayManager {
         { nestingBuilderSupported: true }
       )
     this.overlayWindowNodes.set(tag, overlayNode)
-    this.overlayManager?.addComponentContent(overlayNode, index)
+    content.getOverlayManager().addComponentContent(overlayNode, index)
   }
 
   removeOverlay(tag: string) {
     if (this.overlayWindowsBuildData.hasKey(tag)) {
+      let buildData = this.overlayWindowsBuildData.get(tag)
+      if (this.overlayWindowNodes.hasKey(tag)) {
+        buildData.content.getOverlayManager().removeComponentContent(this.overlayWindowNodes.get(tag))
+        let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
+        node.dispose()
+        this.overlayWindowNodes.remove(tag)
+      }
       this.overlayWindowsBuildData.remove(tag)
-    }
-    if (this.overlayWindowNodes.hasKey(tag)) {
-      this.overlayManager?.removeComponentContent(this.overlayWindowNodes.get(tag))
-      let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
-      node.dispose()
-      this.overlayWindowNodes.remove(tag)
     }
   }
 
-  showOverlay(tag: string, setting?: MoveAbleWrapperParams) {
-    if (this.overlayWindowNodes.hasKey(tag)) {
-      this.overlayManager?.showComponentContent(this.overlayWindowNodes.get(tag))
+  private getBuildDataByTag(tag: string): AppOverlayWrapperBuildData | undefined {
+    if (this.overlayWindowsBuildData.hasKey(tag)) {
+      return this.overlayWindowsBuildData.get(tag)
     }
-    if (setting) {
-      if (this.overlayWindowsBuildData.hasKey(tag)) {
+    return undefined
+  }
+
+  showOverlay(tag: string, setting?: MoveAbleWrapperParams) {
+    let buildData = this.getBuildDataByTag(tag)
+    if (buildData === undefined) return
+    if (this.overlayWindowNodes.hasKey(tag)) {
+      if (setting) {
         this.updateSettingForOverlay(setting, tag)
+      } else {
+        buildData.setting.show = true
       }
+      buildData.content.getOverlayManager().showComponentContent(this.overlayWindowNodes.get(tag))
     }
   }
 
   hideOverlay(tag: string) {
+    let buildData = this.getBuildDataByTag(tag)
+    if (buildData === undefined) return
     if (this.overlayWindowNodes.hasKey(tag)) {
-      this.overlayManager?.hideComponentContent(this.overlayWindowNodes.get(tag))
+      buildData.content.getOverlayManager().hideComponentContent(this.overlayWindowNodes.get(tag))
       this.overlayWindowsBuildData.get(tag).setting.show = false
     }
   }
@@ -189,9 +204,9 @@ class AppOverlayManager {
       return
     }
     let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
-    let builder = this.overlayWindowsBuildData.get(tag).builder
+    let buildData = this.overlayWindowsBuildData.get(tag)
     this.overlayWindowsBuildData.get(tag).setting = setting
-    node.update(new AppOverlayWrapperBuildData(setting,builder))
+    node.update(new AppOverlayWrapperBuildData(buildData.content,setting,buildData.builder))
   }
 
   getOverlayIsShowing(tag: string) {
@@ -206,8 +221,6 @@ class AppOverlayManager {
   getInfoOfOverlay(tag: string): MoveAbleWrapperParams | undefined {
     let hasBuildInfo = this.overlayWindowsBuildData.hasKey(tag)
     if (hasBuildInfo === false) return undefined
-    let node = this.overlayWindowNodes.get(tag) as ComponentContent<AppOverlayWrapperBuildData>
-
     return this.overlayWindowsBuildData.get(tag).setting
   }
 
